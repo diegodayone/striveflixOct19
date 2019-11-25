@@ -1,18 +1,29 @@
 import React from 'react';
 import { Container, Row, Col } from "reactstrap"
 import MovieList from './MovieList';
+import MyNav from './MyNav';
 
 class MainComponent extends React.Component {
     state = { 
-        movies: []
+        movies: [],
+        searchResult: undefined
      }
 
     render() { 
         return (
         <Container>
+            <MyNav changeSearch={(search) => this.searchMovies(search)}></MyNav>
             { this.state.movies.map((movie, index) =>
                 <MovieList movies={movie.items} key={index} title={movie.title} /> )}
+
+            { this.state.searchResult &&  <MovieList movies={this.state.searchResult} title="Search Result" />}
         </Container> );
+    }
+
+    searchMovies = async (searchQuery) => {
+        let response = await fetch("http://www.omdbapi.com/?apikey=24ad60e9&s=" + searchQuery);
+        let movieResult = await response.json();
+        this.setState({searchResult: movieResult.Search, searchQuery: searchQuery})
     }
 
     componentDidMount = async () => {
