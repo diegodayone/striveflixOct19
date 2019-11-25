@@ -9,7 +9,7 @@ class MainComponent extends React.Component {
         movies: [],
         searchResult: undefined,
         selectedMovieID: undefined
-     }
+    }
 
     render() { 
         return (

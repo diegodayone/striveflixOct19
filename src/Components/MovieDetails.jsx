@@ -1,17 +1,23 @@
 import React from 'react';
-import { Row, Col,ListGroup, ListGroupItem , Input, Button} from "reactstrap"
+import { Row, Col,ListGroup, ListGroupItem , Input, Button, Spinner} from "reactstrap"
 
 class MovieDetails extends React.Component {
     state = { 
         movie: undefined, 
         comments: [],
         newComment: "",
-        rate: 1
+        rate: 1,
+        isLoading: true
     }
 
     render() { 
         let m = this.state.movie;
         let comments = this.state.comments;
+
+        if (this.state.isLoading)
+            return <div className="col-md-12 justify-content-center align-items-center">
+                <Spinner color="dark" style={{ width: "500px", height: "500px"}} />
+                </div>
 
         return ( 
             <>
@@ -27,7 +33,7 @@ class MovieDetails extends React.Component {
                             <ListGroupItem>Awards: {m.Awards}</ListGroupItem>
                             <ListGroupItem>Runtime: {m.Runtime}</ListGroupItem>
                             <ListGroupItem>Actors: {m.Actors}</ListGroupItem>
-                            </ListGroup>
+                        </ListGroup>
                         </Col> 
                     </> 
                     : <h1> Loading... </h1>}
@@ -48,13 +54,36 @@ class MovieDetails extends React.Component {
                             <Row>
                                 <Input placeholder="Write your comment here..." className="col-md-6" type="text" value={this.state.newComment} onChange={(input)=> this.setState({newComment: input.target.value})} />
                                 <Input className="col-md-2" placeholder="1-5" type="number" value={this.state.rate} onChange={(input)=> this.setState({rate: input.target.value})} />
-                                <Button className="col-md-4" onClick={() => console.log(this.state.newComment)} >Send</Button>
+                                <Button className="col-md-4" onClick={this.postComment} >Send</Button>
                             </Row>
                         </Col>
                     </ListGroup>
                 </Row>
             </>
      );
+    }
+
+    postComment = async () => {
+        //Sending a POST to the Comments url 
+        let postComments = await fetch("https://strive-school-testing-apis.herokuapp.com/api/comments/",{
+            headers: {
+                "Authorization": "Basic dXNlcjMwOkU2dFlzNlBCenVmUmZzVlA", //Authentication for User30
+                "Content-Type": "application/json" //Hey Backend, you are about to receive a JSON 
+            },
+            method: "POST", //will be a POST
+            body: JSON.stringify({   //And this is the content of the request
+                rate: this.state.rate,   //rate from state 
+                comment: this.state.newComment, //comment from state
+                elementId: this.props.movieId //movieId from props
+            })
+        })
+
+        let newComment = await postComments.json() //getting the newly created item from the response
+        this.setState({
+            comments: [newComment, ...this.state.comments] //add it as first element of the array
+            //if you want to add it as last:
+            // comments: [...this.state.comments, newComment] 
+        })
     }
 
     componentDidMount = async () => {
@@ -69,6 +98,10 @@ class MovieDetails extends React.Component {
     }
 
     fetchMovieDetails = async () => {
+        this.setState({
+            isLoading: true
+        })
+
         let resp = await fetch("http://www.omdbapi.com/?apikey=24ad60e9&i=" + this.props.movieId)
         let jsonMovie = await resp.json();
 
@@ -81,7 +114,8 @@ class MovieDetails extends React.Component {
 
         this.setState({
             movie: jsonMovie,
-            comments: jsonComments
+            comments: jsonComments,
+            isLoading: false
         })
     }
 }
