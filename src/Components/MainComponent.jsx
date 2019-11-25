@@ -2,23 +2,37 @@ import React from 'react';
 import { Container, Row, Col } from "reactstrap"
 import MovieList from './MovieList';
 import MyNav from './MyNav';
+import MovieDetails from './MovieDetails';
 
 class MainComponent extends React.Component {
     state = { 
         movies: [],
-        searchResult: undefined
+        searchResult: undefined,
+        selectedMovieID: undefined
      }
 
     render() { 
         return (
         <Container>
             <MyNav changeSearch={(search) => this.searchMovies(search)}></MyNav>
-            { this.state.movies.map((movie, index) =>
-                <MovieList movies={movie.items} key={index} title={movie.title} /> )}
+            { this.state.selectedMovieID && <MovieDetails movieId={this.state.selectedMovieID} />}
 
-            { this.state.searchResult &&  <MovieList movies={this.state.searchResult} title="Search Result" />}
+            { this.state.movies.map((movie, index) => 
+                    <MovieList 
+                        movies={movie.items} 
+                        key={index} 
+                        title={movie.title}
+                        setMovieId={this.setSelectedMovieId}
+             /> )}
+
+            { this.state.searchResult && <MovieList 
+                                            movies={this.state.searchResult} 
+                                            title="Search Result"
+                                            setMovieId={this.setSelectedMovieId} />}
         </Container> );
     }
+
+    setSelectedMovieId = (movieId) => this.setState({ selectedMovieID: movieId})
 
     searchMovies = async (searchQuery) => {
         let response = await fetch("http://www.omdbapi.com/?apikey=24ad60e9&s=" + searchQuery);

@@ -10,7 +10,10 @@ class MovieList extends React.Component {
                 <h1>{this.props.title}</h1>
                 <Row>
                     {this.props.movies.map((movie, index)=> 
-                    <MovieItem movie={movie} key={index} />
+                            <MovieItem 
+                                setMovieId={this.props.setMovieId}
+                                movie={movie} 
+                                key={index} />
                    )}
                     </Row>
             </Row>
