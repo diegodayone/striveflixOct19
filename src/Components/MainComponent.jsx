@@ -3,29 +3,42 @@ import { Container } from "reactstrap"
 import MovieList from './MovieList';
 import MyNav from './MyNav';
 import MovieDetails from './MovieDetails';
+import TashComponent from './TashComponent';
 
 class MainComponent extends React.Component {
     state = { 
         movies: [],
         searchResult: undefined,
-        selectedMovieID: undefined
+        selectedMovieID: undefined,
+        toTake: 10
+    }
+
+    setMovieLimit = (number) => {
+        this.setState({
+            toTake: number
+        })
     }
 
     render() { 
         return (
         <Container>
+            <TashComponent email="diego@strive.school" 
+                    movies={this.state.searchResult}
+                    onSetMovieLimit={this.setMovieLimit} />
+
             <MyNav changeSearch={(search) => this.searchMovies(search)}></MyNav>
             { this.state.selectedMovieID && <MovieDetails movieId={this.state.selectedMovieID} />}
 
-            { this.state.movies.map((movie, index) => 
+            { this.state.movies
+                    .map((movie, index) => 
                     <MovieList 
-                        movies={movie.items} 
+                        movies={movie.items.slice(0, this.state.toTake)} 
                         key={index} 
                         title={movie.title}
                         setMovieId={this.setSelectedMovieId} /> )}
 
             { this.state.searchResult && <MovieList 
-                                            movies={this.state.searchResult} 
+                                            movies={this.state.searchResult.slice(0, this.state.toTake)} 
                                             title="Search Result"
                                             setMovieId={this.setSelectedMovieId} />}
         </Container> );
