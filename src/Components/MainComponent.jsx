@@ -1,5 +1,5 @@
 import React from 'react';
-import { Container, Row, Col } from "reactstrap"
+import { Container } from "reactstrap"
 import MovieList from './MovieList';
 import MyNav from './MyNav';
 import MovieDetails from './MovieDetails';
@@ -22,8 +22,7 @@ class MainComponent extends React.Component {
                         movies={movie.items} 
                         key={index} 
                         title={movie.title}
-                        setMovieId={this.setSelectedMovieId}
-             /> )}
+                        setMovieId={this.setSelectedMovieId} /> )}
 
             { this.state.searchResult && <MovieList 
                                             movies={this.state.searchResult} 
